@@ -60,7 +60,7 @@ export default {
   i18nOptions: { namespaces: 'profile' },
   data() {
     return {
-      profileDrawerShown: true
+      profileDrawerShown: false
     }
   },
   router,
