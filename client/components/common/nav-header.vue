@@ -190,51 +190,51 @@
 
           //- ACCOUNT
 
-          v-menu(v-if='isAuthenticated', offset-y, bottom, min-width='300', transition='slide-y-transition', left)
-            template(v-slot:activator='{ on: menu, attrs }')
-              v-tooltip(bottom)
-                template(v-slot:activator='{ on: tooltip }')
-                  v-btn(
-                    icon
-                    v-bind='attrs'
-                    v-on='{ ...menu, ...tooltip }'
-                    :class='$vuetify.rtl ? `ml-0` : ``'
-                    tile
-                    height='64'
-                    :aria-label='$t(`common:header.account`)'
-                    )
-                    v-icon(v-if='picture.kind === `initials`', color='grey') mdi-account-circle
-                    v-avatar(v-else-if='picture.kind === `image`', :size='34')
-                      v-img(:src='picture.url')
-                span {{$t('common:header.account')}}
-            v-list(nav)
-              v-list-item.py-3.grey(:class='$vuetify.theme.dark ? `darken-4-l5` : `lighten-5`')
-                v-list-item-avatar
-                  v-avatar.blue(v-if='picture.kind === `initials`', :size='40')
-                    span.white--text.subheading {{picture.initials}}
-                  v-avatar(v-else-if='picture.kind === `image`', :size='40')
-                    v-img(:src='picture.url')
-                v-list-item-content
-                  v-list-item-title {{name}}
-                  v-list-item-subtitle {{email}}
-              //- v-list-item(href='/w', disabled)
-              //-   v-list-item-action: v-icon(color='blue') mdi-view-compact-outline
-              //-   v-list-item-content
-              //-     v-list-item-title {{$t('common:header.myWiki')}}
-              //-     v-list-item-subtitle.overline Coming soon
-              v-list-item(href='/p')
-                v-list-item-action: v-icon(color='blue-grey') mdi-face-profile
-                v-list-item-content
-                  v-list-item-title(:class='$vuetify.theme.dark ? `blue-grey--text text--lighten-3` : `blue-grey--text`') {{$t('common:header.profile')}}
-              v-list-item(@click='logout')
-                v-list-item-action: v-icon(color='red') mdi-logout
-                v-list-item-title.red--text {{$t('common:header.logout')}}
+          //- v-menu(v-if='isAuthenticated', offset-y, bottom, min-width='300', transition='slide-y-transition', left)
+          //-   template(v-slot:activator='{ on: menu, attrs }')
+          //-     v-tooltip(bottom)
+          //-       template(v-slot:activator='{ on: tooltip }')
+          //-         v-btn(
+          //-           icon
+          //-           v-bind='attrs'
+          //-           v-on='{ ...menu, ...tooltip }'
+          //-           :class='$vuetify.rtl ? `ml-0` : ``'
+          //-           tile
+          //-           height='64'
+          //-           :aria-label='$t(`common:header.account`)'
+          //-           )
+          //-           v-icon(v-if='picture.kind === `initials`', color='grey') mdi-account-circle
+          //-           v-avatar(v-else-if='picture.kind === `image`', :size='34')
+          //-             v-img(:src='picture.url')
+          //-       span {{$t('common:header.account')}}
+          //-   v-list(nav)
+          //-     v-list-item.py-3.grey(:class='$vuetify.theme.dark ? `darken-4-l5` : `lighten-5`')
+          //-       v-list-item-avatar
+          //-         v-avatar.blue(v-if='picture.kind === `initials`', :size='40')
+          //-           span.white--text.subheading {{picture.initials}}
+          //-         v-avatar(v-else-if='picture.kind === `image`', :size='40')
+          //-           v-img(:src='picture.url')
+          //-       v-list-item-content
+          //-         v-list-item-title {{name}}
+          //-         v-list-item-subtitle {{email}}
+          //-     //- v-list-item(href='/w', disabled)
+          //-     //-   v-list-item-action: v-icon(color='blue') mdi-view-compact-outline
+          //-     //-   v-list-item-content
+          //-     //-     v-list-item-title {{$t('common:header.myWiki')}}
+          //-     //-     v-list-item-subtitle.overline Coming soon
+          //-     v-list-item(href='/p')
+          //-       v-list-item-action: v-icon(color='blue-grey') mdi-face-profile
+          //-       v-list-item-content
+          //-         v-list-item-title(:class='$vuetify.theme.dark ? `blue-grey--text text--lighten-3` : `blue-grey--text`') {{$t('common:header.profile')}}
+          //-     v-list-item(@click='logout')
+          //-       v-list-item-action: v-icon(color='red') mdi-logout
+          //-       v-list-item-title.red--text {{$t('common:header.logout')}}
 
-          v-tooltip(v-else, left)
-            template(v-slot:activator='{ on }')
-              v-btn(icon, v-on='on', color='grey darken-3', href='/login', :aria-label='$t(`common:header.login`)')
-                v-icon(color='grey') mdi-account-circle
-            span {{$t('common:header.login')}}
+          //- v-tooltip(v-else, left)
+          //-   template(v-slot:activator='{ on }')
+          //-     v-btn(icon, v-on='on', color='grey darken-3', href='/login', :aria-label='$t(`common:header.login`)')
+          //-       v-icon(color='grey') mdi-account-circle
+          //-   span {{$t('common:header.login')}}
 
     page-selector(mode='create', v-model='newPageModal', :open-handler='pageNewCreate', :locale='locale')
     page-selector(mode='move', v-model='movePageModal', :open-handler='pageMoveRename', :path='path', :locale='locale')
