@@ -70,11 +70,11 @@
                 @keyup.up='searchMove(`up`)'
                 autocomplete='none'
               )
-            v-tooltip(bottom)
-              template(v-slot:activator='{ on }')
-                v-btn.ml-2.mr-0(icon, v-on='on', href='/t', :aria-label='$t(`common:header.browseTags`)')
-                  v-icon(color='grey') mdi-tag-multiple
-              span {{$t('common:header.browseTags')}}
+            //- v-tooltip(bottom)
+            //-   template(v-slot:activator='{ on }')
+            //-     v-btn.ml-2.mr-0(icon, v-on='on', href='/t', :aria-label='$t(`common:header.browseTags`)')
+            //-       v-icon(color='grey') mdi-tag-multiple
+            //-   span {{$t('common:header.browseTags')}}
       v-flex(xs7, md4)
         v-toolbar.nav-header-inner.pr-4(color='black', dark, flat)
           v-spacer
@@ -217,18 +217,18 @@
           //-       v-list-item-content
           //-         v-list-item-title {{name}}
           //-         v-list-item-subtitle {{email}}
-          //-     //- v-list-item(href='/w', disabled)
-          //-     //-   v-list-item-action: v-icon(color='blue') mdi-view-compact-outline
-          //-     //-   v-list-item-content
-          //-     //-     v-list-item-title {{$t('common:header.myWiki')}}
-          //-     //-     v-list-item-subtitle.overline Coming soon
-          //-     v-list-item(href='/p')
-          //-       v-list-item-action: v-icon(color='blue-grey') mdi-face-profile
-          //-       v-list-item-content
-          //-         v-list-item-title(:class='$vuetify.theme.dark ? `blue-grey--text text--lighten-3` : `blue-grey--text`') {{$t('common:header.profile')}}
-          //-     v-list-item(@click='logout')
-          //-       v-list-item-action: v-icon(color='red') mdi-logout
-          //-       v-list-item-title.red--text {{$t('common:header.logout')}}
+              //- v-list-item(href='/w', disabled)
+              //-   v-list-item-action: v-icon(color='blue') mdi-view-compact-outline
+              //-   v-list-item-content
+              //-     v-list-item-title {{$t('common:header.myWiki')}}
+              //-     v-list-item-subtitle.overline Coming soon
+              //- v-list-item(href='/p')
+              //-   v-list-item-action: v-icon(color='blue-grey') mdi-face-profile
+              //-   v-list-item-content
+              //-     v-list-item-title(:class='$vuetify.theme.dark ? `blue-grey--text text--lighten-3` : `blue-grey--text`') {{$t('common:header.profile')}}
+              //- v-list-item(@click='logout')
+              //-   v-list-item-action: v-icon(color='red') mdi-logout
+              //-   v-list-item-title.red--text {{$t('common:header.logout')}}
 
           //- v-tooltip(v-else, left)
           //-   template(v-slot:activator='{ on }')
