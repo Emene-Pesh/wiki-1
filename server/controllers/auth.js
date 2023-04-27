@@ -22,6 +22,7 @@ const bruteforce = new ExpressBrute(new BruteKnex({
 /**
  * Login form
  */
+
 router.get('/login', async (req, res, next) => {
   _.set(res.locals, 'pageMeta.title', 'Login')
 

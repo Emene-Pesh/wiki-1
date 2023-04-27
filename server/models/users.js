@@ -163,14 +163,16 @@ module.exports = class User extends Model {
   // ------------------------------------------------
 
   static async processProfile({ profile, providerKey }) {
-    const provider = _.get(WIKI.auth.strategies, providerKey, {})
-    provider.info = _.find(WIKI.data.authentication, ['key', provider.stategyKey])
-
+    const provider = _.get(WIKI.auth.strategies, providerKey, {}) // this doesnt work for some reason
+    provider.info = _.find(WIKI.data.authentication, ['key', provider.strategyKey])
+    // console.log(WIKI.auth.strategies)
+    console.log(providerKey)
     // Find existing user
     let user = await WIKI.models.users.query().findOne({
       providerId: _.toString(profile.id),
       providerKey
     })
+    console.log(user)
 
     // Parse email
     let primaryEmail = ''
@@ -283,8 +285,10 @@ module.exports = class User extends Model {
 
       return user
     }
-
-    throw new Error('You are not authorized to login.')
+    console.log(profile)
+    console.log(providerKey)
+    console.log(provider)
+    throw new Error('You ARE(not) authorized to login.')
   }
 
   /**
