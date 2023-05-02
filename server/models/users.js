@@ -249,6 +249,11 @@ module.exports = class User extends Model {
       if (pictureUrl === 'internal') {
         await WIKI.models.users.updateUserAvatarData(user.id, profile.picture)
       }
+      await WIKI.models.users.updateUser({
+        id: user.id,
+        groups: profile.groups
+      })
+      // console.log(user.$relatedQuery('groups').relate(profile.groups))
       console.log('user has been updated')
       return user
     }
