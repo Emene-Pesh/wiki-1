@@ -75,10 +75,10 @@ module.exports = async () => {
   // Passport Authentication
   // ----------------------------------------
   // Require dependencies
-  const passport = require('passport')
+  // const passport = require('passport')
 
-  // Enable Passport middleware
-  app.use(passport.initialize())
+  // // Enable Passport middleware
+  // app.use(passport.initialize())
 
   app.use(cookieParser())
   app.use(session({

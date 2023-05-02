@@ -13,7 +13,7 @@ module.exports = {
       new JwtStrategy({
         algorithms: ['HS256'],
         secretOrKey: conf.jwtSecret,
-        jwtFromRequest: ExtractJwt.fromUrlQueryParameter('auth_token')
+        jwtFromRequest: ExtractJwt.fromUrlQueryParameter('jwt')
       }, async (jwtPayload, cb) => {
         try {
           const user = await WIKI.models.users.processProfile({
@@ -26,11 +26,16 @@ module.exports = {
             */
             profile: {
               id: jwtPayload.id,
-              email: jwtPayload.email
+              email: jwtPayload.email,
+              groups: jwtPayload.groups
             }
           })
-          cb(null, user)
+
+          process.nextTick(() => {
+            cb(null, user)
+          })
         } catch (err) {
+          console.log('catch error')
           cb(err, null)
         }
       })
