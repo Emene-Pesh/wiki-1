@@ -22,6 +22,7 @@ const bruteforce = new ExpressBrute(new BruteKnex({
 /**
  * Login form
  */
+
 router.get('/login', async (req, res, next) => {
   _.set(res.locals, 'pageMeta.title', 'Login')
 
@@ -55,6 +56,13 @@ router.get('/login/:strategy', async (req, res, next) => {
     await WIKI.models.users.login({
       strategy: req.params.strategy
     }, { req, res })
+    const stg = await WIKI.models.authentication.query().orderBy('order').first()
+    const stgInfo = _.find(WIKI.data.authentication, ['key', stg.strategyKey])
+    if (!stgInfo.useForm) {
+      return res.redirect(`/login/${'jwt'}`)
+    }
+    return res.redirect(`/login/${stg.key}`)
+    // return res.redirect('/en/home')
   } catch (err) {
     next(err)
   }
@@ -63,6 +71,8 @@ router.get('/login/:strategy', async (req, res, next) => {
 /**
  * Social Strategies Callback
  */
+// SEND JWT TOKEN TO THIS
+// EG http://localhost:3000/login/cd2d2d60-7cb2-4c9d-9cc4-9e6b66502745/callback?jwt=
 router.all('/login/:strategy/callback', async (req, res, next) => {
   if (req.method !== 'GET' && req.method !== 'POST') { return next() }
 

@@ -162,25 +162,25 @@
                         v-icon(:color='$vuetify.theme.dark ? `blue-grey lighten-1` : `blue-grey darken-2`', dense) mdi-comment-plus
                     span {{$t('common:comments.newComment')}}
 
-            v-card.page-author-card.mb-5
-              .pa-5
-                .overline.indigo--text.d-flex(:class='$vuetify.theme.dark ? `text--lighten-3` : ``')
-                  span {{$t('common:page.lastEditedBy')}}
-                  v-spacer
-                  v-tooltip(right, v-if='isAuthenticated')
-                    template(v-slot:activator='{ on }')
-                      v-btn.btn-animate-edit(
-                        icon
-                        :href='"/h/" + locale + "/" + path'
-                        v-on='on'
-                        x-small
-                        v-if='hasReadHistoryPermission'
-                        :aria-label='$t(`common:header.history`)'
-                        )
-                        v-icon(color='indigo', dense) mdi-history
-                    span {{$t('common:header.history')}}
-                .page-author-card-name.body-2.grey--text(:class='$vuetify.theme.dark ? `` : `text--darken-3`') {{ authorName }}
-                .page-author-card-date.caption.grey--text.text--darken-1 {{ updatedAt | moment('calendar') }}
+            //- v-card.page-author-card.mb-5
+            //-   .pa-5
+            //-     .overline.indigo--text.d-flex(:class='$vuetify.theme.dark ? `text--lighten-3` : ``')
+            //-       span {{$t('common:page.lastEditedBy')}}
+            //-       v-spacer
+            //-       v-tooltip(right, v-if='isAuthenticated')
+            //-         template(v-slot:activator='{ on }')
+            //-           v-btn.btn-animate-edit(
+            //-             icon
+            //-             :href='"/h/" + locale + "/" + path'
+            //-             v-on='on'
+            //-             x-small
+            //-             v-if='hasReadHistoryPermission'
+            //-             :aria-label='$t(`common:header.history`)'
+            //-             )
+            //-             v-icon(color='indigo', dense) mdi-history
+            //-         span {{$t('common:header.history')}}
+            //-     .page-author-card-name.body-2.grey--text(:class='$vuetify.theme.dark ? `` : `text--darken-3`') {{ authorName }}
+            //-     .page-author-card-date.caption.grey--text.text--darken-1 {{ updatedAt | moment('calendar') }}
 
             //- v-card.mb-5
             //-   .pa-5
@@ -195,30 +195,30 @@
             //-       )
             //-       .caption.grey--text 5 votes
 
-            v-card.page-shortcuts-card(flat)
-              v-toolbar(:color='$vuetify.theme.dark ? `grey darken-4-d3` : `grey lighten-3`', flat, dense)
-                v-spacer
-                //- v-tooltip(bottom)
-                //-   template(v-slot:activator='{ on }')
-                //-     v-btn(icon, tile, v-on='on', :aria-label='$t(`common:page.bookmark`)'): v-icon(color='grey') mdi-bookmark
-                //-   span {{$t('common:page.bookmark')}}
-                v-menu(offset-y, bottom, min-width='300')
-                  template(v-slot:activator='{ on: menu }')
-                    v-tooltip(bottom)
-                      template(v-slot:activator='{ on: tooltip }')
-                        v-btn(icon, tile, v-on='{ ...menu, ...tooltip }', :aria-label='$t(`common:page.share`)'): v-icon(color='grey') mdi-share-variant
-                      span {{$t('common:page.share')}}
-                  social-sharing(
-                    :url='pageUrl'
-                    :title='title'
-                    :description='description'
-                  )
-                v-tooltip(bottom)
-                  template(v-slot:activator='{ on }')
-                    v-btn(icon, tile, v-on='on', @click='print', :aria-label='$t(`common:page.printFormat`)')
-                      v-icon(:color='printView ? `primary` : `grey`') mdi-printer
-                  span {{$t('common:page.printFormat')}}
-                v-spacer
+            //- v-card.page-shortcuts-card(flat)
+            //-   v-toolbar(:color='$vuetify.theme.dark ? `grey darken-4-d3` : `grey lighten-3`', flat, dense)
+            //-     v-spacer
+            //-     //- v-tooltip(bottom)
+            //-     //-   template(v-slot:activator='{ on }')
+            //-     //-     v-btn(icon, tile, v-on='on', :aria-label='$t(`common:page.bookmark`)'): v-icon(color='grey') mdi-bookmark
+            //-     //-   span {{$t('common:page.bookmark')}}
+            //-     v-menu(offset-y, bottom, min-width='300')
+            //-       template(v-slot:activator='{ on: menu }')
+            //-         v-tooltip(bottom)
+            //-           template(v-slot:activator='{ on: tooltip }')
+            //-             v-btn(icon, tile, v-on='{ ...menu, ...tooltip }', :aria-label='$t(`common:page.share`)'): v-icon(color='grey') mdi-share-variant
+            //-           span {{$t('common:page.share')}}
+            //-       social-sharing(
+            //-         :url='pageUrl'
+            //-         :title='title'
+            //-         :description='description'
+            //-       )
+            //-     v-tooltip(bottom)
+            //-       template(v-slot:activator='{ on }')
+            //-         v-btn(icon, tile, v-on='on', @click='print', :aria-label='$t(`common:page.printFormat`)')
+            //-           v-icon(:color='printView ? `primary` : `grey`') mdi-printer
+            //-       span {{$t('common:page.printFormat')}}
+            //-     v-spacer
 
           v-flex.page-col-content(
             xs12
