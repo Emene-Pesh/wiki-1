@@ -1,14 +1,16 @@
 /* global WIKI */
-
+// STUDENT EMENE FLAG: WHOLE FILE
 // ------------------------------------
 // JWT Token
 // ------------------------------------
 
 const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
+// const _ = require('lodash')
 
 module.exports = {
   init (passport, conf) {
+    // conf is the definition.yml file in the same folder
     passport.use(conf.key,
       new JwtStrategy({
         algorithms: ['HS256'],
@@ -16,21 +18,34 @@ module.exports = {
         jwtFromRequest: ExtractJwt.fromUrlQueryParameter('jwt')
       }, async (jwtPayload, cb) => {
         try {
+          if (jwtPayload.iat == null) {
+            throw new WIKI.Error.AuthLoginFailed()
+          }
+          const millisElapsed = Date.now() - jwtPayload.iat * 1000
+          const minutesElapsed = Math.floor(millisElapsed / 1000 / 60)
+          if (minutesElapsed > 60) {
+            throw new WIKI.Error.AuthLoginFailed()
+          }
+          const lowercaseArray = jwtPayload.groups.map(str => str.toLowerCase())
+          // Gets all the wikiJs groups
+          const groupsArray = await WIKI.models.groups.query()
+          console.log('models groups', groupsArray)
+          // match using the names and return the ids
+          const ids = groupsArray.filter(dict => lowercaseArray.includes(dict.name.toLowerCase())).map(dict => dict.id)
+          console.log(ids) // groups
           const user = await WIKI.models.users.processProfile({
-            providerKey: 'cd2d2d60-7cb2-4c9d-9cc4-9e6b66502745',
+            providerKey: '25033c4e-5e85-4a5e-a2b5-98b034a738df',
             /* the provider key is created when a new authentication strategy is added
             in the admin pannel of wiki.js.
-            to access it you can use console.log(WIKI.auth.strategies)
-            or go to domainOfWiki/login , click JWT , and the key will be after the login/
-            eg: http://localhost:3000/login/cd2d2d60-7cb2-4c9d-9cc4-9e6b66502745
+            Administration -> Authentication -> JWT -> Callback URL / Redirect URL
+            // is between the login/ and the /callback in the url
             */
             profile: {
               id: jwtPayload.id,
               email: jwtPayload.email,
-              groups: jwtPayload.groups
+              groups: ids
             }
           })
-
           process.nextTick(() => {
             cb(null, user)
           })
