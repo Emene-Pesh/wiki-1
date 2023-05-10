@@ -30,6 +30,7 @@ server/views/setup.pug
 /config.yml
 
 # Data directories
+/backups
 /repo
 /data
 /uploads

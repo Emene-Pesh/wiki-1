@@ -201,7 +201,16 @@ module.exports = class Asset extends Model {
     }
     const sendFile = Promise.promisify(res.sendFile, {context: res})
     res.type(path.extname(assetPath))
-    await sendFile(cachePath, { dotfiles: 'deny' })
+    // STUDENT EMENE FLAG:Start
+    // try catch to prevent assets from breaking on reload of the wikiJS
+    try {
+      await sendFile(cachePath, { dotfiles: 'deny' })
+    } catch (error) {
+      await sendFile(cachePath, { dotfiles: 'deny', root: '/wiki/' })
+      // root: needs to match the root folder where your wiki lives on your system
+      // usually is '/wiki/' if run in a container. :)
+    }
+    // STUDENT EMENE FLAG: END
     return true
   }
 

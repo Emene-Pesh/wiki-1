@@ -81,7 +81,7 @@
                         )
                         v-tooltip(top)
                           template(v-slot:activator='{ on }')
-                            v-btn.ml-2(icon, tile, color='white', v-on='on', @click='copyFromLocaleDialogIsShown = true')
+                            v-btn.ml-2(icon, tile, color='white', v-on='on', @click='copyFromLocaleDialogIsShown = false')
                               v-icon mdi-arrange-send-backward
                           span {{$t('admin:navigation.copyFromLocale')}}
                       v-list.py-2(dense, nav, dark, class='blue darken-2', style='border-radius: 0;')
