@@ -163,17 +163,14 @@ module.exports = class User extends Model {
   // ------------------------------------------------
 
   static async processProfile({ profile, providerKey }) {
-    const provider = _.get(WIKI.auth.strategies, providerKey, {}) // this doesnt work for some reason
+    const provider = _.get(WIKI.auth.strategies, providerKey, {})
     provider.info = _.find(WIKI.data.authentication, ['key', provider.strategyKey])
-    // console.log(WIKI.auth.strategies)
     console.log(providerKey)
     // Find existing user
     let user = await WIKI.models.users.query().findOne({
       providerId: _.toString(profile.id),
       providerKey
     })
-    console.log('created user')
-
     // Parse email
     let primaryEmail = ''
     if (_.isArray(profile.emails)) {
@@ -191,7 +188,6 @@ module.exports = class User extends Model {
       throw new Error('Missing or invalid email address from profile.')
     }
     primaryEmail = _.toLower(primaryEmail)
-    // console.log('parsed email')
 
     // Find pending social user
     if (!user) {
@@ -206,7 +202,6 @@ module.exports = class User extends Model {
         })
       }
     }
-    // console.log('pending user?')
 
     // Parse display name
     let displayName = ''
@@ -217,7 +212,6 @@ module.exports = class User extends Model {
     } else {
       displayName = primaryEmail.split('@')[0]
     }
-    // console.log('parsed displayName')
 
     // Parse picture URL / Data
     let pictureUrl = ''
@@ -229,7 +223,6 @@ module.exports = class User extends Model {
         omission: ''
       })
     }
-    // console.log('parsed pictureUrl')
 
     // Update existing user
     if (user) {
@@ -239,7 +232,6 @@ module.exports = class User extends Model {
       if (user.isSystem) {
         throw new Error('This is a system reserved account and cannot be used.')
       }
-      console.log('updating user')
       user = await user.$query().patchAndFetch({
         email: primaryEmail,
         name: displayName,
@@ -249,17 +241,17 @@ module.exports = class User extends Model {
       if (pictureUrl === 'internal') {
         await WIKI.models.users.updateUserAvatarData(user.id, profile.picture)
       }
+      // STUDENT EMENE FLAG: Start
+      // update the user groups
       await WIKI.models.users.updateUser({
         id: user.id,
         groups: profile.groups
       })
-      // console.log(user.$relatedQuery('groups').relate(profile.groups))
-      console.log('user has been updated')
+      // STUDENT EMENE FLAG: END
       return user
     }
     // Self-registration
     if (provider.selfRegistration) {
-      console.log('self registering user')
       // Check if email domain is whitelisted
       if (_.get(provider, 'domainWhitelist', []).length > 0) {
         const emailDomain = _.last(primaryEmail.split('@'))
@@ -267,7 +259,6 @@ module.exports = class User extends Model {
           throw new WIKI.Error.AuthRegistrationDomainUnauthorized()
         }
       }
-      console.log('creating account')
       // Create account
       user = await WIKI.models.users.query().insertAndFetch({
         providerKey: providerKey,
@@ -282,26 +273,18 @@ module.exports = class User extends Model {
         isActive: true,
         isVerified: true
       })
-      console.log('assigning to group')
       // Assign to group(s)
       if (provider.autoEnrollGroups.length > 0) {
         await user.$relatedQuery('groups').relate(provider.autoEnrollGroups)
       }
-      console.log('automatic groups given?', provider.autoEnrollGroups)
       // Is an INT number referencing the group id ex [3, 2, 1]
 
       if (pictureUrl === 'internal') {
         await WIKI.models.users.updateUserAvatarData(user.id, profile.picture)
       }
       await user.$relatedQuery('groups').relate(profile.groups)
-      console.log(profile.groups)
-      // console.log('the groups if any', user.groups)
-      console.log('end of creation check')
       return user
     }
-    // console.log(profile)
-    // console.log(providerKey)
-    // console.log(provider)
     throw new Error('You ARE(not) authorized to login.')
   }
 
@@ -326,8 +309,6 @@ module.exports = class User extends Model {
 
       // Authenticate
       return new Promise((resolve, reject) => {
-        // console.log('promise', resolve, reject)
-        // console.log('pp.auth', WIKI.auth.passport)
         WIKI.auth.passport.authenticate(selStrategy.key, {
           session: !strInfo.useForm,
           scope: strInfo.scopes ? strInfo.scopes : null
@@ -336,7 +317,6 @@ module.exports = class User extends Model {
           if (!user) { return reject(new WIKI.Error.AuthLoginFailed()) }
 
           try {
-            // console.log('starting after loginchecks')
             const resp = await WIKI.models.users.afterLoginChecks(user, context, {
               skipTFA: !strInfo.useForm,
               skipChangePwd: !strInfo.useForm
@@ -407,7 +387,6 @@ module.exports = class User extends Model {
     }
 
     // Must Change Password?
-    // console.log('tryna change passwords?')
     if (!skipChangePwd && user.mustChangePwd) {
       try {
         const pwdChangeToken = await WIKI.models.userKeys.generateToken({
@@ -425,13 +404,10 @@ module.exports = class User extends Model {
         throw new WIKI.Error.AuthGenericError()
       }
     }
-    // console.log('returning a promise')
     return new Promise((resolve, reject) => {
       context.req.login(user, { session: false }, async errc => {
         if (errc) { return reject(errc) }
         const jwtToken = await WIKI.models.users.refreshToken(user)
-        // console.log('jwttoken', jwtToken)
-        // console.log('redirect', redirect)
         resolve({ jwt: jwtToken.token, redirect })
       })
     })
@@ -441,9 +417,7 @@ module.exports = class User extends Model {
    * Generate a new token for a user
    */
   static async refreshToken(user) {
-    // console.log('refreshing the token')
     if (_.isSafeInteger(user)) {
-      // console.log('is safe integer')
       user = await WIKI.models.users.query().findById(user).withGraphFetched('groups').modifyGraph('groups', builder => {
         builder.select('groups.id', 'permissions')
       })
@@ -462,7 +436,6 @@ module.exports = class User extends Model {
     // Update Last Login Date
     // -> Bypass Objection.js to avoid updating the updatedAt field
     await WIKI.models.knex('users').where('id', user.id).update({ lastLoginAt: new Date().toISOString() })
-    // console.log('making token')
     return {
       token: jwt.sign({
         id: user.id,

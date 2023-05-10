@@ -105,27 +105,27 @@
                       v-icon.px-3(color='grey lighten-1', small) {{ $vuetify.rtl ? `mdi-chevron-left` : `mdi-chevron-right` }}
                       v-list-item-title.px-3.caption.grey--text(:class='$vuetify.theme.dark ? `text--lighten-1` : `text--darken-1`') {{tocSubItem.title}}
                     //- v-divider(inset, v-if='tocIdx < toc.length - 1')
-
-            v-card.page-tags-card.mb-5(v-if='tags.length > 0')
-              .pa-5
-                .overline.teal--text.pb-2(:class='$vuetify.theme.dark ? `text--lighten-3` : ``') {{$t('common:page.tags')}}
-                v-chip.mr-1.mb-1(
-                  label
-                  :color='$vuetify.theme.dark ? `teal darken-1` : `teal lighten-5`'
-                  v-for='(tag, idx) in tags'
-                  :href='`/t/` + tag.tag'
-                  :key='`tag-` + tag.tag'
-                  )
-                  v-icon(:color='$vuetify.theme.dark ? `teal lighten-3` : `teal`', left, small) mdi-tag
-                  span(:class='$vuetify.theme.dark ? `teal--text text--lighten-5` : `teal--text text--darken-2`') {{tag.title}}
-                v-chip.mr-1.mb-1(
-                  label
-                  :color='$vuetify.theme.dark ? `teal darken-1` : `teal lighten-5`'
-                  :href='`/t/` + tags.map(t => t.tag).join(`/`)'
-                  :aria-label='$t(`common:page.tagsMatching`)'
-                  )
-                  v-icon(:color='$vuetify.theme.dark ? `teal lighten-3` : `teal`', size='20') mdi-tag-multiple
-
+            //- STUDENT EMENE FLAG: START Remove below
+            //- v-card.page-tags-card.mb-5(v-if='tags.length > 0')
+            //-   .pa-5
+            //-     .overline.teal--text.pb-2(:class='$vuetify.theme.dark ? `text--lighten-3` : ``') {{$t('common:page.tags')}}
+            //-     v-chip.mr-1.mb-1(
+            //-       label
+            //-       :color='$vuetify.theme.dark ? `teal darken-1` : `teal lighten-5`'
+            //-       v-for='(tag, idx) in tags'
+            //-       :href='`/t/` + tag.tag'
+            //-       :key='`tag-` + tag.tag'
+            //-       )
+            //-       v-icon(:color='$vuetify.theme.dark ? `teal lighten-3` : `teal`', left, small) mdi-tag
+            //-       span(:class='$vuetify.theme.dark ? `teal--text text--lighten-5` : `teal--text text--darken-2`') {{tag.title}}
+            //-     v-chip.mr-1.mb-1(
+            //-       label
+            //-       :color='$vuetify.theme.dark ? `teal darken-1` : `teal lighten-5`'
+            //-       :href='`/t/` + tags.map(t => t.tag).join(`/`)'
+            //-       :aria-label='$t(`common:page.tagsMatching`)'
+            //-       )
+            //-       v-icon(:color='$vuetify.theme.dark ? `teal lighten-3` : `teal`', size='20') mdi-tag-multiple
+            //- STUDENT EMENE FLAG: END
             v-card.page-comments-card.mb-5(v-if='commentsEnabled && commentsPerms.read')
               .pa-5
                 .overline.pb-2.blue-grey--text.d-flex.align-center(:class='$vuetify.theme.dark ? `text--lighten-3` : `text--darken-2`')
@@ -161,7 +161,7 @@
                         )
                         v-icon(:color='$vuetify.theme.dark ? `blue-grey lighten-1` : `blue-grey darken-2`', dense) mdi-comment-plus
                     span {{$t('common:comments.newComment')}}
-
+            //- STUDENT EMENE FLAG:START REMOVE BELOW
             //- v-card.page-author-card.mb-5
             //-   .pa-5
             //-     .overline.indigo--text.d-flex(:class='$vuetify.theme.dark ? `text--lighten-3` : ``')
@@ -181,7 +181,7 @@
             //-         span {{$t('common:header.history')}}
             //-     .page-author-card-name.body-2.grey--text(:class='$vuetify.theme.dark ? `` : `text--darken-3`') {{ authorName }}
             //-     .page-author-card-date.caption.grey--text.text--darken-1 {{ updatedAt | moment('calendar') }}
-
+            //- STUDENT EMENE FLAG: END
             //- v-card.mb-5
             //-   .pa-5
             //-     .overline.pb-2.yellow--text(:class='$vuetify.theme.dark ? `text--darken-3` : `text--darken-4`') Rating

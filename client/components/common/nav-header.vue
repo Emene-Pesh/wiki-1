@@ -70,11 +70,13 @@
                 @keyup.up='searchMove(`up`)'
                 autocomplete='none'
               )
+            //- STUDENT EMENE FLAG: START
             //- v-tooltip(bottom)
             //-   template(v-slot:activator='{ on }')
             //-     v-btn.ml-2.mr-0(icon, v-on='on', href='/t', :aria-label='$t(`common:header.browseTags`)')
             //-       v-icon(color='grey') mdi-tag-multiple
             //-   span {{$t('common:header.browseTags')}}
+            //- STUDENT EMENE FLAG: END
       v-flex(xs7, md4)
         v-toolbar.nav-header-inner.pr-4(color='black', dark, flat)
           v-spacer
@@ -189,7 +191,8 @@
             v-divider(vertical)
 
           //- ACCOUNT
-
+          //- STUDENT EMENE FLAG:START
+          //- Remove everything below
           //- v-menu(v-if='isAuthenticated', offset-y, bottom, min-width='300', transition='slide-y-transition', left)
           //-   template(v-slot:activator='{ on: menu, attrs }')
           //-     v-tooltip(bottom)
@@ -235,6 +238,7 @@
           //-     v-btn(icon, v-on='on', color='grey darken-3', href='/login', :aria-label='$t(`common:header.login`)')
           //-       v-icon(color='grey') mdi-account-circle
           //-   span {{$t('common:header.login')}}
+          //- STUDENT EMENE FLAG: END
 
     page-selector(mode='create', v-model='newPageModal', :open-handler='pageNewCreate', :locale='locale')
     page-selector(mode='move', v-model='movePageModal', :open-handler='pageMoveRename', :path='path', :locale='locale')
@@ -242,11 +246,11 @@
     page-delete(v-model='deletePageModal', v-if='path && path.length')
     page-convert(v-model='convertPageModal', v-if='path && path.length')
 
-    .nav-header-dev(v-if='isDevMode')
-      v-icon mdi-alert
-      div
-        .overline DEVELOPMENT VERSION
-        .overline This code base is NOT for production use!
+    //- .nav-header-dev(v-if='isDevMode')
+    //-   v-icon mdi-alert
+    //-   div
+    //-     .overline DEVELOPMENT VERSION
+    //-     .overline This code base is NOT for production use!
 </template>
 
 <script>

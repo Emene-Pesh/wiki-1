@@ -1,12 +1,16 @@
+# Defines the authentication strategy and makes it appear in Wiki.js
 key: jwt
 title: JWT
 description: Authenticate via JWT token
-author: Lilian Abiven
+author: // STUDENT EMENE FLAG Whole file
 logo: https://static.requarks.io/logo/wikijs.svg
 color: primary
-website: https://wiki.js.org
+website: https://jwt.io/
 isAvailable: true
 useForm: false
+# variables that can be changed from the wiki.js admin settings
+# These variables will then be read in the authentication.js code prefaced by conf for configuration file
+# eg: conf.jwtSecret
 props:
   jwtSecret:
     type: String
