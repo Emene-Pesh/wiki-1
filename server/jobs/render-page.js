@@ -15,12 +15,29 @@ module.exports = async (pageId) => {
     if (!page) {
       throw new Error('Invalid Page Id')
     }
-
     await WIKI.models.renderers.fetchDefinitions()
     const pipeline = await WIKI.models.renderers.getRenderingPipeline(page.contentType)
+    // STUDENT EMENE FLAG: START
+    console.log('content type', page.contentType)
+    if (page.contentType === 'markdown') {
+      var output = page.content
+      let match
+      const regexPattern = /{include: (\d+)}/g
+      console.log('page content is ', typeof page.content)
+      while ((match = regexPattern.exec(output)) !== null) {
+        const id = match[1]
+        console.log(typeof id)
+        const page2 = await WIKI.models.pages.getPageFromDb(parseInt(id))
+        if (!page2) {
+          throw new Error('Invalid include')
+        }
+        output = output.replace(match[0], page2.content)
+      }
+      output = output + `\n<br><br><br><br><br><br><br><br>\n---\n <span style="opacity: 0.5;">id: ${pageId}</span>`
+    }
 
-    let output = page.content
-
+    console.log('output is', output)
+    // STUDENT EMENE FLAG: END
     if (_.isEmpty(page.content)) {
       await WIKI.models.knex.destroy()
       WIKI.logger.warn(`Failed to render page ID ${pageId} because content was empty: [ FAILED ]`)
