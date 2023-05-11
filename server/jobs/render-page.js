@@ -18,9 +18,9 @@ module.exports = async (pageId) => {
     await WIKI.models.renderers.fetchDefinitions()
     const pipeline = await WIKI.models.renderers.getRenderingPipeline(page.contentType)
     // STUDENT EMENE FLAG: START
+    var output = page.content
     console.log('content type', page.contentType)
     if (page.contentType === 'markdown') {
-      var output = page.content
       let match
       const regexPattern = /{include: (\d+)}/g
       console.log('page content is ', typeof page.content)
@@ -33,7 +33,7 @@ module.exports = async (pageId) => {
         }
         output = output.replace(match[0], page2.content)
       }
-      output = output + `\n<br><br><br><br><br><br><br><br>\n---\n <span style="opacity: 0.5;">id: ${pageId}</span>`
+      output = output + ` \n<br><br><br><br><br><br><br><br>\n---\n <span style="opacity: 0.5;">id: ${pageId}</span>`
     }
 
     console.log('output is', output)
