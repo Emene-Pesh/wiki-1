@@ -1,8 +1,9 @@
+# STUDENT EMENE FLAG Whole file
 # Defines the authentication strategy and makes it appear in Wiki.js
 key: jwt
 title: JWT
 description: Authenticate via JWT token
-author: // STUDENT EMENE FLAG Whole file
+author: EMENE
 logo: https://static.requarks.io/logo/wikijs.svg
 color: primary
 website: https://jwt.io/

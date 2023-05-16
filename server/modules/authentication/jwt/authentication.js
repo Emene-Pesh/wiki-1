@@ -26,13 +26,13 @@ module.exports = {
           if (minutesElapsed > 60) {
             throw new WIKI.Error.AuthLoginFailed()
           }
-          const lowercaseArray = jwtPayload.groups.map(str => str.toLowerCase())
+          const lowercaseGroups = jwtPayload.groups.map(str => str.toLowerCase())
           // Gets all the wikiJs groups
           const groupsArray = await WIKI.models.groups.query()
-          console.log('models groups', groupsArray)
+          // console.log('models groups', groupsArray)
           // match using the names and return the ids
-          const ids = groupsArray.filter(dict => lowercaseArray.includes(dict.name.toLowerCase())).map(dict => dict.id)
-          console.log(ids) // groups
+          const ids = groupsArray.filter(dict => lowercaseGroups.includes(dict.name.toLowerCase())).map(dict => dict.id)
+          // console.log(ids) // groups
           const user = await WIKI.models.users.processProfile({
             providerKey: '25033c4e-5e85-4a5e-a2b5-98b034a738df',
             /* the provider key is created when a new authentication strategy is added

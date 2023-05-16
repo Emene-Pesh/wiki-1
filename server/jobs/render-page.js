@@ -18,7 +18,8 @@ module.exports = async (pageId) => {
     await WIKI.models.renderers.fetchDefinitions()
     const pipeline = await WIKI.models.renderers.getRenderingPipeline(page.contentType)
     // STUDENT EMENE FLAG: START
-    var output = page.content
+    let output = page.content
+    console.log(output)
     // console.log('content type', page.contentType)
     if (page.contentType === 'markdown') {
       let match
