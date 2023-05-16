@@ -5,6 +5,7 @@ const _ = require('lodash')
 const CleanCSS = require('clean-css')
 const moment = require('moment')
 const qs = require('querystring')
+const cheerio = require('cheerio')
 
 /* global WIKI */
 
@@ -547,6 +548,29 @@ router.get('/*', async (req, res, next) => {
           // -> Page Filename (for edit on external repo button)
           let pageFilename = WIKI.config.lang.namespacing ? `${pageArgs.locale}/${page.path}` : page.path
           pageFilename += page.contentType === 'markdown' ? '.md' : '.html'
+          // STUDENT EMENE FLAG: START
+          console.log('Page Render before secret', page.render)
+
+          // Load the HTML string into cheerio
+          const $ = cheerio.load(page.render)
+
+          // Get the updated HTML string without the 'secret' elements
+          // console.log('user groups', req.user.groups)
+          const targetGroups = ['support', 'administrators']
+          const groupsArray = await WIKI.models.groups.query()
+          // console.log('groups array', groupsArray)
+          const hasMatchingId = groupsArray.some(dictionary => targetGroups.includes(dictionary.name.toLowerCase()) && req.user.groups.includes(dictionary.id))
+          // console.log('matching groups', hasMatchingId)
+          if (hasMatchingId === false) {
+            // Find all elements with the 'secret' class and remove them
+            $('.secret').remove()
+            page.render = $.html()
+          }
+          // console.log('page path', tempPage.path)
+          // console.log('page', tempPage)
+          console.log('Page Render after secret', page.render)
+
+          // STUDENT EMENE FLAG: END
 
           // -> Render view
           res.render('page', {
