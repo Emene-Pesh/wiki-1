@@ -544,31 +544,94 @@ router.get('/*', async (req, res, next) => {
               commentTmpl.main = _.replace(commentTmpl.main, new RegExp(`{{${cfg.key}}}`, 'g'), cfg.value)
             })
           }
-
           // -> Page Filename (for edit on external repo button)
           let pageFilename = WIKI.config.lang.namespacing ? `${pageArgs.locale}/${page.path}` : page.path
           pageFilename += page.contentType === 'markdown' ? '.md' : '.html'
           // STUDENT EMENE FLAG: START
-          console.log('Page Render before secret', page.render)
+          console.log(page.render)
+          // const regexPattern = new RegExp('[[(\\w+)\\s+(.*)]]', 'gm')
+          // match = regexPattern.test(page.render)
+          // console.log(match)
+          const regex = /{{(\w+)\s+(.*)}}/g
+          const regexVar = /(\w+="[^"]*")/g
+          let str = page.render
+          let cache = new Map()
+          cache.set(page.title, true)
+          cache.set(page.id.toString(), true)
+          var visible
+          let matchFound = true
+          while (matchFound) {
+            matchFound = false
+            let matches = [...str.matchAll(regex)]
+            for (const match of matches) {
+              console.log(match)
+              matchFound = true
+              var fullMatch = match[0]
+              var firstGroup = match[1]
+              var secondGroup = match[2]
+              var parameters = [...secondGroup.matchAll(regexVar)]
+              for (var parameter of parameters) {
+                console.log(parameter)
+                let [key, value] = parameter[0].split('=')
+                value = value.substring(1, value.length - 1)
+                console.log(value, typeof value)
+                if (key.trim() === 'visible') {
+                  var targetGroups = ['support', 'administrators']
+                  var access = value.split(';')
+                  visible = true
+                  console.log(access)
+                }
+                if (firstGroup === 'include') {
+                  if (key.trim() === 'article') {
+                    console.log('map', cache)
+                    console.log('before the break', cache.has(value))
+                    if (cache.has(value) === true) {
+                      str = str.replace(fullMatch, '')
+                      break
+                    }
+                    let page2
+                    if (isNaN(value)) {
+                      console.log('NAN', value)
+                      page2 = await WIKI.models.pages.query({title: value})
+                      cache.set(page2.title, true)
+                      cache.set(page2.id.toString(), true)
+                    } else {
+                      console.log('int', value)
+                      page2 = await WIKI.models.pages.getPage(parseInt(value))
+                      cache.set(page2.title, true)
+                      cache.set(value, true)
+                    }
+                    str = str.replace(fullMatch, page2.render)
+                    console.log(value)
+                    break
+                  }
+                } else if (firstGroup === 'block') {
+                  str = str.replace(fullMatch, 'blocked')
+                  break
+                }
+                // console.log(fullMatch, firstGroup, secondGroup)
+              }
+            }
+          }
 
-          // Load the HTML string into cheerio
-          const $ = cheerio.load(page.render)
+          page.render = str
+          // console.log('Page Render before secret', page.render)
 
           // Get the updated HTML string without the 'secret' elements
           // console.log('user groups', req.user.groups)
-          const targetGroups = ['support', 'administrators']
-          const groupsArray = await WIKI.models.groups.query()
-          // console.log('groups array', groupsArray)
-          const hasMatchingId = groupsArray.some(dictionary => targetGroups.includes(dictionary.name.toLowerCase()) && req.user.groups.includes(dictionary.id))
-          // console.log('matching groups', hasMatchingId)
-          if (hasMatchingId === false) {
-            // Find all elements with the 'secret' class and remove them
-            $('.secret').remove()
-            page.render = $.html()
-          }
+          // const targetGroups = ['support', 'administrators']
+          // const groupsArray = await WIKI.models.groups.query()
+          // // console.log('groups array', groupsArray)
+          // const hasMatchingId = groupsArray.some(dictionary => targetGroups.includes(dictionary.name.toLowerCase()) && req.user.groups.includes(dictionary.id))
+          // // console.log('matching groups', hasMatchingId)
+          // if (hasMatchingId === false) {
+          //   // Find all elements with the 'secret' class and remove them
+          //   $('.secret').remove()
+          //   page.render = $.html()
+          // }
           // console.log('page path', tempPage.path)
           // console.log('page', tempPage)
-          console.log('Page Render after secret', page.render)
+          // console.log('Page Render after secret', page.render)
 
           // STUDENT EMENE FLAG: END
 
