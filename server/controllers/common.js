@@ -6,6 +6,7 @@ const CleanCSS = require('clean-css')
 const moment = require('moment')
 const qs = require('querystring')
 const cheerio = require('cheerio')
+const { cache } = require('webpack')
 
 /* global WIKI */
 
@@ -548,73 +549,11 @@ router.get('/*', async (req, res, next) => {
           let pageFilename = WIKI.config.lang.namespacing ? `${pageArgs.locale}/${page.path}` : page.path
           pageFilename += page.contentType === 'markdown' ? '.md' : '.html'
           // STUDENT EMENE FLAG: START
-          console.log(page.render)
-          // const regexPattern = new RegExp('[[(\\w+)\\s+(.*)]]', 'gm')
-          // match = regexPattern.test(page.render)
-          // console.log(match)
-          const regex = /{{(\w+)\s+(.*)}}/g
-          const regexVar = /(\w+="[^"]*")/g
-          let str = page.render
+          // console.log(page.render)
+          var str = ''
           let cache = new Map()
-          cache.set(page.title, true)
-          cache.set(page.id.toString(), true)
-          var visible
-          let matchFound = true
-          while (matchFound) {
-            matchFound = false
-            let matches = [...str.matchAll(regex)]
-            for (const match of matches) {
-              console.log(match)
-              matchFound = true
-              var fullMatch = match[0]
-              var firstGroup = match[1]
-              var secondGroup = match[2]
-              var parameters = [...secondGroup.matchAll(regexVar)]
-              for (var parameter of parameters) {
-                console.log(parameter)
-                let [key, value] = parameter[0].split('=')
-                value = value.substring(1, value.length - 1)
-                console.log(value, typeof value)
-                if (key.trim() === 'visible') {
-                  var targetGroups = ['support', 'administrators']
-                  var access = value.split(';')
-                  visible = true
-                  console.log(access)
-                }
-                if (firstGroup === 'include') {
-                  if (key.trim() === 'article') {
-                    console.log('map', cache)
-                    console.log('before the break', cache.has(value))
-                    if (cache.has(value) === true) {
-                      str = str.replace(fullMatch, '')
-                      break
-                    }
-                    let page2
-                    if (isNaN(value)) {
-                      console.log('NAN', value)
-                      page2 = await WIKI.models.pages.query({title: value})
-                      cache.set(page2.title, true)
-                      cache.set(page2.id.toString(), true)
-                    } else {
-                      console.log('int', value)
-                      page2 = await WIKI.models.pages.getPage(parseInt(value))
-                      cache.set(page2.title, true)
-                      cache.set(value, true)
-                    }
-                    str = str.replace(fullMatch, page2.render)
-                    console.log(value)
-                    break
-                  }
-                } else if (firstGroup === 'block') {
-                  str = str.replace(fullMatch, 'blocked')
-                  break
-                }
-                // console.log(fullMatch, firstGroup, secondGroup)
-              }
-            }
-          }
-
-          page.render = str
+          str = await WIKI.models.pages.nesting([], page.id, cache)
+          // console.log('hey str here', str)
           // console.log('Page Render before secret', page.render)
 
           // Get the updated HTML string without the 'secret' elements
@@ -634,7 +573,7 @@ router.get('/*', async (req, res, next) => {
           // console.log('Page Render after secret', page.render)
 
           // STUDENT EMENE FLAG: END
-
+          page.render = str
           // -> Render view
           res.render('page', {
             page,

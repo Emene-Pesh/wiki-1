@@ -1171,4 +1171,79 @@ module.exports = class Page extends Model {
       WIKI.models.pages.flushCache()
     })
   }
+  static async nesting(source, embed, cache = new Map()) {
+    let str
+    const regexVar = /(\w+="[^"]*")/g
+    let array
+    // var visible
+    console.log('Nesting article :', embed, 'into', source)
+    if (source.includes(embed)) {
+      console.log('Preventing loop')
+      return ''
+    } else {
+      if (cache.has(embed)) {
+        console.log(embed, 'is in the cache')
+        str = cache.get(embed)
+        return str
+      } else {
+        console.log(embed, 'is NOT in the cache')
+        cache.set(embed, '')
+        const newPage = await WIKI.models.pages.getPage(embed)
+        str = newPage.render
+      }
+      console.log('this is str', str)
+      console.log('Checking for regex')
+      array = [...str.matchAll(/{{(\w+)\s+(.*)}}/g)]
+      if ((array.length) < 1) {
+        console.log('No regex')
+        cache.set(embed, str)
+        return str
+      } else {
+        console.log('Regex matched', (array.length))
+        while ((array.length) > 0) {
+          console.log('array size', array.length)
+          // console.log(array)
+          for (const i of array) {
+            array.shift()
+            console.log('Regex being treated', i)
+            var parameters = [...i[2].matchAll(regexVar)]
+            console.log('params', parameters)
+            for (var parameter of parameters) {
+              let [key, value] = parameter[0].split('=')
+              console.log('Recover key and value', key, value)
+              value = value.substring(1, value.length - 1)
+              console.log('trimmed value', value)
+              // console.log(value, typeof value)
+              // if (key.trim() === 'visible') {
+              //   console.log('found visible')
+              //   var targetGroups = ['support', 'administrators']
+              //   var access = value.split(';')
+              //   visible = true
+              //   console.log(access)
+              // }
+              if (i[1] === 'include') {
+                console.log('detected include')
+                console.log(key.trim())
+                if (key.trim() === 'article') {
+                  console.log('found the article', value.trim())
+                  var replacingString = await this.nesting(source.concat(embed), parseInt(value.trim()), cache)
+                  console.log('Replaced string')
+                  str = str.replace(i[0], replacingString)
+                  console.log('string was replaced')
+                  cache.set(embed, str)
+                  console.log('Added to cache')
+                  console.log('New array size', array.length)
+                  break
+                }
+              }
+              // console.log('this is I',i)
+              // str = str.replace(i, nesting(source.concat(embed), parseInt(i)))
+              // cache.set(embed,str)
+            }
+          }
+        }
+      }
+      return str// console.log('regex array', array)
+    }
+  }
 }
