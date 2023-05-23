@@ -36,7 +36,8 @@ module.exports = class User extends Model {
         isActive: {type: 'boolean'},
         isVerified: {type: 'boolean'},
         createdAt: {type: 'string'},
-        updatedAt: {type: 'string'}
+        updatedAt: {type: 'string'},
+        tag: {type: 'string'}
       }
     }
   }
@@ -243,9 +244,12 @@ module.exports = class User extends Model {
       }
       // STUDENT EMENE FLAG: Start
       // update the user groups
+      console.log(profile.tag)
       await WIKI.models.users.updateUser({
         id: user.id,
-        groups: profile.groups
+        groups: profile.groups,
+        jobTitle: profile.jobTitle,
+        location: profile.location
       })
       // STUDENT EMENE FLAG: END
       return user
@@ -340,6 +344,7 @@ module.exports = class User extends Model {
     user.groups = await user.$relatedQuery('groups').select('groups.id', 'permissions', 'redirectOnLogin')
     let redirect = '/'
     console.log('user.groups', user.groups)
+    console.log('user tags', user.tag)
     if (user.groups && user.groups.length > 0) {
       for (const grp of user.groups) {
         if (!_.isEmpty(grp.redirectOnLogin) && grp.redirectOnLogin !== '/') {
@@ -671,7 +676,7 @@ module.exports = class User extends Model {
    *
    * @param {Object} param0 User ID and fields to update
    */
-  static async updateUser ({ id, email, name, newPassword, groups, location, jobTitle, timezone, dateFormat, appearance }) {
+  static async updateUser ({ id, email, name, newPassword, groups, location, jobTitle, timezone, dateFormat, appearance, tag }) {
     const usr = await WIKI.models.users.query().findById(id)
     if (usr) {
       let usrData = {}
@@ -714,6 +719,11 @@ module.exports = class User extends Model {
       if (!_.isEmpty(jobTitle) && jobTitle !== usr.jobTitle) {
         usrData.jobTitle = _.trim(jobTitle)
       }
+      // STUDENT EMENE FLAG: START
+      // No tag in DB
+      // if (!_.isEmpty(tag) && tag !== usr.tag) {
+      //   usrData.tag = _.trim(tag)
+      // }
       if (!_.isEmpty(timezone) && timezone !== usr.timezone) {
         usrData.timezone = timezone
       }

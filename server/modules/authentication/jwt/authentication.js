@@ -26,12 +26,18 @@ module.exports = {
           if (minutesElapsed > 60) {
             throw new WIKI.Error.AuthLoginFailed()
           }
+          const myArray = jwtPayload.attractions.split(';')
+          const result = myArray.flatMap(group => group.split(':').map(value => value.toLowerCase().trim()))
+          console.log(result)
           const lowercaseGroups = jwtPayload.groups.map(str => str.toLowerCase())
           // Gets all the wikiJs groups
           const groupsArray = await WIKI.models.groups.query()
           // console.log('models groups', groupsArray)
           // match using the names and return the ids
           const ids = groupsArray.filter(dict => lowercaseGroups.includes(dict.name.toLowerCase())).map(dict => dict.id)
+          const id = groupsArray.filter(dict => result.includes(dict.name.toLowerCase())).map(dict => dict.id)
+          console.log(id)
+          console.log(ids + id)
           // console.log(ids) // groups
           const user = await WIKI.models.users.processProfile({
             providerKey: '25033c4e-5e85-4a5e-a2b5-98b034a738df',
@@ -43,7 +49,9 @@ module.exports = {
             profile: {
               id: jwtPayload.id,
               email: jwtPayload.email,
-              groups: ids
+              groups: ids.concat(id),
+              jobTitle: 'MOBILE',
+              location: jwtPayload.attractions
             }
           })
           process.nextTick(() => {
