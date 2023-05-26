@@ -1171,11 +1171,12 @@ module.exports = class Page extends Model {
       WIKI.models.pages.flushCache()
     })
   }
-  static async nesting(source, embed, cache = new Map()) {
+
+  static async nesting(source, embed, cache, userAccess) {
     let str
     const regexVar = /(\w+="[^"]*")/g
     let array
-    // var visible
+    var visible
     console.log('Nesting article :', embed, 'into', source)
     if (source.includes(embed)) {
       console.log('Preventing loop')
@@ -1213,14 +1214,16 @@ module.exports = class Page extends Model {
               console.log('Recover key and value', key, value)
               value = value.substring(1, value.length - 1)
               console.log('trimmed value', value)
-              // console.log(value, typeof value)
-              // if (key.trim() === 'visible') {
-              //   console.log('found visible')
-              //   var targetGroups = ['support', 'administrators']
-              //   var access = value.split(';')
-              //   visible = true
-              //   console.log(access)
-              // }
+              console.log(value, typeof value)
+              if (key.trim() === 'visible') {
+                console.log('found visible')
+                console.log('User access', userAccess)
+                if (userAccess.includes(value)) {
+                  visible = true
+                } else {
+                  visible = false
+                }
+              }
               if (i[1] === 'include') {
                 console.log('detected include')
                 console.log(key.trim())
@@ -1235,7 +1238,29 @@ module.exports = class Page extends Model {
                   console.log('New array size', array.length)
                   break
                 }
+                // OLD BLOCK MANAGE
               }
+              // else if (i[1] === 'block') {
+              //   const endPattern = /{{end}}/g
+              //   const ends = [...str.matchAll(endPattern)]
+
+              //   console.log('block here')
+              //   if (visible) {
+              //     console.log(i.index)
+              //     str = str.replace(i[0], '')
+              //     console.log('This block should be visible')
+              //     for (const end of ends) {
+              //       console.log('Found end at', end.index)
+              //       str = str.replace(end[0], '')
+              //     }
+              //   } else {
+              //     for (const end of ends) {
+              //       console.log('Found end at', end.index)
+              //       str = str.substring(0, i.index) + str.substring(end.index + 7)
+              //     }
+              //     console.log('Hide this block')
+              //   }
+              // }
               // console.log('this is I',i)
               // str = str.replace(i, nesting(source.concat(embed), parseInt(i)))
               // cache.set(embed,str)
@@ -1245,5 +1270,157 @@ module.exports = class Page extends Model {
       }
       return str// console.log('regex array', array)
     }
+  }
+
+  static async removeWordByIndices(str, startIndex, endIndex) {
+    const beforeWord = str.substring(0, startIndex)
+    console.log('lastchar', str[endIndex])
+    console.log('beforeWord', beforeWord)
+    const afterWord = str.substring(endIndex)
+    console.log('afterWord', afterWord)
+    console.log('difference', (beforeWord + afterWord).length - str.length)
+    return beforeWord + afterWord
+  }
+  static async shiftBlocks(block, shift) {
+    block.index -= shift
+    block.last_char -= shift
+    block.end.index -= shift
+    block.end.last_char -= shift
+    return block
+  }
+  static async visibleCheck(visible, permission) {
+    console.log('visible check ', visible, permission)
+    return (visible === permission)
+  }
+  static async nestedBlocks(string) {
+    const blockRegex = /{{(\w+)\s*(.*?)}}/g
+    const paramRegex = /(\w+="[^"]*")/g
+    var str = string
+    let blocks = new Array()
+    let match
+    let block
+
+    while ((match = blockRegex.exec(str)) !== null) {
+      // console.log('block treated so far ', i)
+      // // console.log('latest block', blocks[i].string)
+
+      // console.log('$$$$ String to operate \n', str)
+      // console.log('$$$$$$ END OF STRING $$$$$')
+      if (match[1] === 'block') {
+        blocks.push(
+          {
+            string: match[0],
+            type: match[1],
+            shift: match[0].length,
+            index: match.index,
+            last_char: match.index + match[0].length,
+            visible: null,
+            end: null
+          }
+        )
+        // console.log(match[0])
+      } else if (match[1] === 'end') {
+        let endedBlock
+        for (var j = blocks.length - 1; j >= 0; j--) {
+          endedBlock = blocks[j]
+          if (endedBlock.end === null) {
+            break
+          }
+        }
+        console.log('ended block', endedBlock)
+        // const sub = str.substring((endedBlock.index+ indexShift), match.index + endShift + indexShift)
+        // console.log('character of starting string', str[endedBlock.index+indexShift])
+        // console.log('Sub string to manage',sub)
+        // console.log('end of substring \n')
+
+        endedBlock.end = {
+          string: match[0],
+          type: match[1],
+          shift: match[0].length,
+          index: match.index,
+          last_char: match.index + match[0].length
+        }
+      }
+    }
+
+    // console.log('full string',str)
+    console.log('amount of block', blocks.length)
+    for (block of blocks) {
+      console.log('Block starting at ', block.index)
+      console.log(block)
+    }
+    let k = 0
+    while (k < blocks.length) {
+      let firstBlock = blocks[k]
+      let params = firstBlock.string.match(paramRegex)
+      while ((params) !== null) {
+        console.log('found params', params)
+        const keyValue = params[0].split('=')
+        const key = keyValue[0]
+        const value = keyValue[1].replace(/"/g, '')
+        if (key === 'visible') {
+          firstBlock.visible = value
+          console.log('Is visible?', value)
+          break // Exit the loop once the 'visible' parameter is found
+        }
+        // NEED TO CONSIDER OTHER PARAMETERS THAN VISIBLE OR THE LOOP WILL NOT STOP
+      }
+      console.log('IS IT VISIBLE: ', firstBlock.visible, await WIKI.models.pages.visibleCheck(firstBlock.visible, 'ARN'))
+
+      // REMOVE THE {{block}} tag
+      str = await WIKI.models.pages.removeWordByIndices(str, firstBlock.index, firstBlock.last_char)
+      console.log(str)
+      firstBlock.end.index -= firstBlock.shift
+      firstBlock.end.last_char -= firstBlock.shift
+      console.log('Removed the first line', str)
+      for (block of blocks) {
+        if (block.index > firstBlock.index) {
+          console.log('shift of ', firstBlock.shift)
+          console.log('start before shift', block.index)
+          block = await WIKI.models.pages.shiftBlocks(block, firstBlock.shift)
+          console.log('start after shift', block.index)
+          console.log(str.substring(block.index - 1, block.last_char))
+        }
+      }
+      // reverse that condition
+      // visible check doesnt use the user parameters yet
+      if (!(await WIKI.models.pages.visibleCheck(firstBlock.visible, 'ARN'))) {
+        console.log('visible check done')
+        for (block of blocks) {
+          if (block.index > firstBlock.index) {
+            console.log('first check')
+            if (block.end.index < firstBlock.end.index) {
+              blocks = blocks.filter((obj) => obj.end.index !== block.end.index)
+              console.log(block.string, ' Should be hidden')
+            } else {
+              if (block.index < firstBlock.end.index) {
+                block.index -= (firstBlock.end.last_char - firstBlock.index)
+                block.end.index -= (firstBlock.end.last_char - firstBlock.index)
+              } else {
+                block = await WIKI.models.pages.shiftBlocks(block, (firstBlock.end.last_char - firstBlock.index))
+              }
+            }
+          }
+        }
+        str = await WIKI.models.pages.removeWordByIndices(str, firstBlock.index, firstBlock.end.last_char)
+        console.log('UPDATED BLOCKS ', blocks)
+      } else {
+        console.log('sub', str.substring(firstBlock.end.index, firstBlock.end.last_char))
+        str = await WIKI.models.pages.removeWordByIndices(str, firstBlock.end.index, firstBlock.end.last_char)
+        console.log('sec str', str)
+        for (block of blocks) {
+          console.log(block.index, firstBlock.end.index)
+          if (block.index > firstBlock.end.index) {
+            console.log('before the end shift', block.index, block.last_char)
+            block = await WIKI.models.pages.shiftBlocks(block, firstBlock.end.shift)
+            console.log('after the end shift', block.index, block.last_char)
+            console.log(str.substring(block.index - 1, block.last_char))
+          }
+        }
+      }
+
+      k++
+    }
+    return str
   }
 }

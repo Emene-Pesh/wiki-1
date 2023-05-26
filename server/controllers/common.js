@@ -552,7 +552,9 @@ router.get('/*', async (req, res, next) => {
           // console.log(page.render)
           var str = ''
           let cache = new Map()
-          str = await WIKI.models.pages.nesting([], page.id, cache)
+          console.log('This is the user location', req.user)
+          str = await WIKI.models.pages.nesting([], page.id, cache, req.user.location)
+          str = await WIKI.models.pages.nestedBlocks(str)
           // console.log('hey str here', str)
           // console.log('Page Render before secret', page.render)
 
