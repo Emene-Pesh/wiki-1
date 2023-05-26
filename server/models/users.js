@@ -440,6 +440,7 @@ module.exports = class User extends Model {
 
     // Update Last Login Date
     // -> Bypass Objection.js to avoid updating the updatedAt field
+    // STUDENT FLAG EMENE
     await WIKI.models.knex('users').where('id', user.id).update({ lastLoginAt: new Date().toISOString() })
     return {
       token: jwt.sign({
@@ -451,6 +452,7 @@ module.exports = class User extends Model {
         lc: user.localeCode,
         df: user.dateFormat,
         ap: user.appearance,
+        location: user.location,
         // defaultEditor: user.defaultEditor,
         permissions: user.getGlobalPermissions(),
         groups: user.getGroups()
